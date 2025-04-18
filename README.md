@@ -8,6 +8,10 @@ chmod +x add_watermark.sh
 chmod +x add_subtitles.sh
 ```
 
+Add at least 2 videos in this repo:
+
+E.g: video1.mov, video2.mp4
+
 Changing config in each scripts
 
 Then run script based on your demand:
