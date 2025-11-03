@@ -1,0 +1,55 @@
+# ==========================================================
+# GPU version: Real-ESRGAN + CUDA 12.1 + PyTorch GPU build
+# ==========================================================
+FROM nvidia/cuda:12.1.0-devel-ubuntu22.04
+
+# -----------------------------
+# 0. Environment setup
+# -----------------------------
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Ho_Chi_Minh
+ENV PYTHONUNBUFFERED=1
+WORKDIR /workspace
+
+# -----------------------------
+# 1. System dependencies
+# -----------------------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.10 python3.10-dev python3-pip python3-distutils \
+    git wget ffmpeg libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -sf /usr/bin/python3.10 /usr/bin/python
+RUN python -m pip install --upgrade pip
+
+# -----------------------------
+# 2. PyTorch GPU + deps (numpy <2)
+# -----------------------------
+RUN pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu121
+RUN pip install numpy==1.26.4 lmdb basicsr facexlib gfpgan
+RUN pip install opencv-python==4.7.0.72 tqdm Pillow==10.1.0
+
+# -----------------------------
+# 3. Clone and setup Real-ESRGAN
+# -----------------------------
+RUN git clone https://github.com/xinntao/Real-ESRGAN.git && \
+    cd Real-ESRGAN && \
+    pip install --no-deps -r requirements.txt && \
+    python setup.py develop
+
+# -----------------------------
+# 4. Download pretrained model
+# -----------------------------
+RUN mkdir -p /workspace/Real-ESRGAN/models && \
+    wget https://huggingface.co/alexgenovese/upscalers/resolve/main/RealESRGAN_x4plus.pth \
+    -O /workspace/Real-ESRGAN/models/RealESRGAN_x4plus.pth
+
+# -----------------------------
+# 5. Default working directory
+# -----------------------------
+WORKDIR /workspace/Real-ESRGAN
+
+# -----------------------------
+# 6. Default command
+# -----------------------------
+CMD ["/bin/bash"]

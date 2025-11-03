@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  realesrgan:
+    build: .
+    container_name: realesrgan
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    runtime: nvidia
+    volumes:
+      - ./input:/workspace/input
+      - ./frames:/workspace/frames
+      - ./frames_up:/workspace/frames_up

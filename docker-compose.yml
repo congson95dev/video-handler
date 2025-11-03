@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  realesrgan:
+    build: .
+    container_name: realesrgan
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./input:/workspace/input
+      - ./frames:/workspace/frames
+      - ./frames_up:/workspace/frames_up
